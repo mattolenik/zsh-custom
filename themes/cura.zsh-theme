@@ -7,7 +7,7 @@ function profile() {
     echo -n default
   fi
 }
-PROMPT='$(profile) [${AWS_DEFAULT_PROFILE}] $(git_prompt_info)${nl}${ret_status} %{$fg[cyan]%}%(5~|%-1~/…/%3~|%4~)%{$reset_color%} '
+PROMPT='$(profile) [${AWS_DEFAULT_PROFILE}] $(git_prompt_info)${nl}%{$fg_bold[cyan]%}%(5~|%-1~/…/%3~|%4~) ${ret_status}%{$reset_color%}'
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg_bold[blue]%}git:(%{$fg[red]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%} "
