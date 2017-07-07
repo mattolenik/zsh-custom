@@ -59,7 +59,10 @@ aws_info() {
   elif [[ ! -z "$prof" ]]; then
     print -n "$(icon) $prof"
   elif [[ ! -z "$reg" ]]; then
-    print -n "$missing_symbol in $reg"
+    if [[ ! -z "${missing_symbol// }" ]]; then
+      print -n "$missing_symbol "
+    fi
+    print -n "in $reg"
   fi
   print -n "\n\0" # The null character prevents the shell from stripping the newline when calling $(aws_info)
 }
