@@ -1,14 +1,8 @@
 local ret_status="%(?:%{$fg_bold[green]%}➜ :%{$fg_bold[red]%}➜ )"
 nl=$'\n'
-separator=${CURATHEME_SEPARATOR:-〜}
 prod_symbol=${CURATHEME_SYMBOL_PROD:-"🐿️ "}
-other_symbol=${CURATHEME_SYMBOL:-"⇪ "}
-
-region() {
-  if [ ! -z "$AWS_REGION" ]; then
-    print -n in $AWS_REGION
-  fi
-}
+other_symbol=${CURATHEME_SYMBOL:-"🎭 "}
+missing_symbol=${CURATHEME_SYMBOL_MISSING:-"🤷 "}
 
 collapsed_wd() {
   wd=$(pwd)
@@ -16,8 +10,9 @@ collapsed_wd() {
 }
 
 icon() {
+  local resolved_profile=${AWS_PROFILE:-"$AWS_DEFAULT_PROFILE"}
   print -n %{$fg_bold[red]%}
-  if [[ $AWS_PROFILE = "prod" ]]; then
+  if [[ $resolved_profile = "prod" ]]; then
     print -n "$prod_symbol"
   else
     print -n "$other_symbol"
@@ -26,27 +21,50 @@ icon() {
 }
 
 profile() {
-  icon
-  print -n ' '
-  if [[ ! -z $"AWS_PROFILE" ]]; then
+  if [[ ! -v AWS_PROFILE ]] && [[ ! -v AWS_DEFAULT_PROFILE ]]; then return; fi
+  if [[ -v AWS_PROFILE ]]; then
     print -n %{$fg_bold[red]%}$AWS_PROFILE%{$reset_color%}
-    if [[ $AWS_DEFAULT_PROFILE != $AWS_PROFILE ]]; then
-      print -n "[$AWS_DEFAULT_PROFILE]"
+    if [[ -v AWS_DEFAULT_PROFILE ]] && [[ $AWS_DEFAULT_PROFILE != $AWS_PROFILE ]]; then
+      print -n " [$AWS_DEFAULT_PROFILE]"
     fi
   else
-    print -n "[${AWS_DEFAULT_PROFILE}]"
+    print -n '['%{$fg_bold[red]%}$AWS_DEFAULT_PROFILE%{$reset_color%}']'
   fi
 }
 
-git_separator() {
-
-  if [[ -d .git ]] || git rev-parse --git-dir > /dev/null 2>&1; then
-    print -n " $separator "
+region() {
+  if [[ ! -v AWS_REGION ]] && [[ ! -v AWS_DEFAULT_REGION ]]; then return; fi
+  if [[ -v AWS_REGION ]]; then
+    print -n "$AWS_REGION"
+    if [[ -v AWS_DEFAULT_REGION ]] && [[ $AWS_DEFAULT_REGION != $AWS_REGION ]]; then
+      print -n " [$AWS_DEFAULT_REGION]"
+    fi
+  else
+    print -n "[${AWS_DEFAULT_REGION}]"
   fi
 }
 
-aws='$(profile) $(region)'
-PROMPT=$aws'$(git_separator)$(git_prompt_info)${nl}%{$fg_bold[cyan]%}$(collapsed_wd) ${ret_status}%{$reset_color%}'
+aws_info() {
+  if [[ ! -v AWS_PROFILE ]] && \
+     [[ ! -v AWS_DEFAULT_PROFILE ]] && \
+     [[ ! -v AWS_REGION ]] && \
+     [[ ! -v AWS_DEFAULT_REGION ]]; then
+    return
+  fi
+  # zsh parameter expansion, trim leading and trailing whitespace
+  local prof="${$(profile)/[[:space:]]/ }"
+  local reg="${$(region)/[[:space:]]/ }"
+  if [[ ! -z "$prof" ]] && [[ ! -z "$reg" ]]; then
+    print -n "$(icon) $prof in $reg"
+  elif [[ ! -z "$prof" ]]; then
+    print -n "$(icon) $prof"
+  elif [[ ! -z "$reg" ]]; then
+    print -n "$missing_symbol in $reg"
+  fi
+  print -n "\n\0" # The null character prevents the shell from stripping the newline when calling $(aws_info)
+}
+
+PROMPT='$(aws_info)%{$fg_bold[cyan]%}$(collapsed_wd) ${ret_status}%{$reset_color%}$(git_prompt_info)'
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg_bold[blue]%}git:(%{$fg[red]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%} "
