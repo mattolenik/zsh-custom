@@ -1,16 +1,8 @@
 local ret_status="%(?:%{$fg_bold[green]%}➜ :%{$fg_bold[red]%}➜ )"
 nl=$'\n'
-
-profile() {
-  if [[ -v AWS_PROFILE ]]; then
-    print -n %{$fg_bold[red]%}$AWS_PROFILE%{$reset_color%}
-    if [[ $AWS_DEFAULT_PROFILE != $AWS_PROFILE ]]; then
-      print -n " [$AWS_DEFAULT_PROFILE]"
-    fi
-  else
-    print -n "[${AWS_DEFAULT_PROFILE}]"
-  fi
-}
+separator=${CURATHEME_SEPARATOR:-〜}
+prod_symbol=${CURATHEME_SYMBOL_PROD:-"🐿️"}
+other_symbol=${CURATHEME_SYMBOL:-"⇪"}
 
 region() {
   if [ ! -z "$AWS_REGION" ]; then
@@ -24,18 +16,35 @@ collapsed_wd() {
 }
 
 icon() {
+  print -n %{$fg_bold[red]%}
   if [[ $AWS_PROFILE = "prod" ]]; then
-    print -n 🐿️
+    print -n "$prod_symbol "
   else
-    print -n ⇪
+    print -n "$other_symbol "
+  fi
+  print -n %{$reset_color%}
+}
+
+profile() {
+  icon
+  if [[ -v AWS_PROFILE ]]; then
+    print -n %{$fg_bold[red]%}$AWS_PROFILE%{$reset_color%}
+    if [[ $AWS_DEFAULT_PROFILE != $AWS_PROFILE ]]; then
+      print -n " [$AWS_DEFAULT_PROFILE]"
+    fi
+  else
+    print -n "[${AWS_DEFAULT_PROFILE}]"
   fi
 }
 
-tab() {
-  print "\u0009"
+git_separator() {
+  if [[ -d .git ]]; then
+    print -n " $separator "
+  fi
 }
 
-PROMPT='%{$fg_bold[red]%}$(icon) %{$reset_color%} $(profile) $(region)$(tab)$(git_prompt_info)${nl}%{$fg_bold[cyan]%}$(collapsed_wd) ${ret_status}%{$reset_color%}'
+aws='$(profile) $(region)'
+PROMPT=$aws'$(git_separator)$(git_prompt_info)${nl}%{$fg_bold[cyan]%}$(collapsed_wd) ${ret_status}%{$reset_color%}'
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg_bold[blue]%}git:(%{$fg[red]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%} "
