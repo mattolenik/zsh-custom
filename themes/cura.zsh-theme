@@ -18,15 +18,16 @@ collapsed_wd() {
 icon() {
   print -n %{$fg_bold[red]%}
   if [[ $AWS_PROFILE = "prod" ]]; then
-    print -n "$prod_symbol "
+    print -n "$prod_symbol"
   else
-    print -n "$other_symbol "
+    print -n "$other_symbol"
   fi
   print -n %{$reset_color%}
 }
 
 profile() {
   icon
+  print -n '  '
   if [[ -v AWS_PROFILE ]]; then
     print -n %{$fg_bold[red]%}$AWS_PROFILE%{$reset_color%}
     if [[ $AWS_DEFAULT_PROFILE != $AWS_PROFILE ]]; then
@@ -38,7 +39,8 @@ profile() {
 }
 
 git_separator() {
-  if [[ -d .git ]]; then
+
+  if [[ -d .git ]] || git rev-parse --git-dir > /dev/null 2>&1; then
     print -n " $separator "
   fi
 }
