@@ -1,8 +1,8 @@
 local ret_status="%(?:%{$fg_bold[green]%}➜ :%{$fg_bold[red]%}➜ )"
 nl=$'\n'
 separator=${CURATHEME_SEPARATOR:-〜}
-prod_symbol=${CURATHEME_SYMBOL_PROD:-"🐿️"}
-other_symbol=${CURATHEME_SYMBOL:-"⇪"}
+prod_symbol=${CURATHEME_SYMBOL_PROD:-"🐿️ "}
+other_symbol=${CURATHEME_SYMBOL:-"⇪ "}
 
 region() {
   if [ ! -z "$AWS_REGION" ]; then
@@ -27,11 +27,11 @@ icon() {
 
 profile() {
   icon
-  print -n '  '
-  if [[ -v AWS_PROFILE ]]; then
+  print -n ' '
+  if [[ ! -z $"AWS_PROFILE" ]]; then
     print -n %{$fg_bold[red]%}$AWS_PROFILE%{$reset_color%}
     if [[ $AWS_DEFAULT_PROFILE != $AWS_PROFILE ]]; then
-      print -n " [$AWS_DEFAULT_PROFILE]"
+      print -n "[$AWS_DEFAULT_PROFILE]"
     fi
   else
     print -n "[${AWS_DEFAULT_PROFILE}]"
