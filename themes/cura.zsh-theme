@@ -21,22 +21,22 @@ icon() {
 }
 
 profile() {
-  if [[ ! -v AWS_PROFILE ]] && [[ ! -v AWS_DEFAULT_PROFILE ]]; then return; fi
-  if [[ -v AWS_PROFILE ]]; then
+  if [[ -z "$AWS_PROFILE" ]] && [[ -z "$AWS_DEFAULT_PROFILE" ]]; then return; fi
+  if [[ ! -z "$AWS_PROFILE" ]]; then
     print -n %{$fg_bold[red]%}$AWS_PROFILE%{$reset_color%}
-    if [[ -v AWS_DEFAULT_PROFILE ]] && [[ $AWS_DEFAULT_PROFILE != $AWS_PROFILE ]]; then
+    if [[ ! -z "$AWS_DEFAULT_PROFILE" ]] && [[ "$AWS_DEFAULT_PROFILE" != "$AWS_PROFILE" ]]; then
       print -n " [$AWS_DEFAULT_PROFILE]"
     fi
   else
-    print -n '['%{$fg_bold[red]%}$AWS_DEFAULT_PROFILE%{$reset_color%}']'
+	print -n '['%{$fg_bold[red]%}$AWS_DEFAULT_PROFILE%{$reset_color%}']'
   fi
 }
 
 region() {
-  if [[ ! -v AWS_REGION ]] && [[ ! -v AWS_DEFAULT_REGION ]]; then return; fi
-  if [[ -v AWS_REGION ]]; then
+  if [[ -z "$AWS_REGION" ]] && [[ -z "$AWS_DEFAULT_REGION" ]]; then return; fi
+  if [[ ! -z "$AWS_REGION" ]]; then
     print -n "$AWS_REGION"
-    if [[ -v AWS_DEFAULT_REGION ]] && [[ $AWS_DEFAULT_REGION != $AWS_REGION ]]; then
+    if [[ -z "$AWS_DEFAULT_REGION" ]] && [[ "$AWS_DEFAULT_REGION" != "$AWS_REGION" ]]; then
       print -n " [$AWS_DEFAULT_REGION]"
     fi
   else
@@ -45,10 +45,10 @@ region() {
 }
 
 aws_info() {
-  if [[ ! -v AWS_PROFILE ]] && \
-     [[ ! -v AWS_DEFAULT_PROFILE ]] && \
-     [[ ! -v AWS_REGION ]] && \
-     [[ ! -v AWS_DEFAULT_REGION ]]; then
+  if [[ -z "$AWS_PROFILE" ]] && \
+     [[ -z "$AWS_DEFAULT_PROFILE" ]] && \
+     [[ -z "$AWS_REGION" ]] && \
+     [[ -z "$AWS_DEFAULT_REGION" ]]; then
     return
   fi
   # zsh parameter expansion, trim leading and trailing whitespace
