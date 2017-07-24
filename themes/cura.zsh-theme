@@ -28,7 +28,7 @@ profile() {
       print -n " [$AWS_DEFAULT_PROFILE]"
     fi
   else
-	print -n '['%{$fg_bold[red]%}$AWS_DEFAULT_PROFILE%{$reset_color%}']'
+    print -n '['%{$fg_bold[red]%}$AWS_DEFAULT_PROFILE%{$reset_color%}']'
   fi
 }
 
@@ -36,7 +36,7 @@ region() {
   if [[ -z "$AWS_REGION" ]] && [[ -z "$AWS_DEFAULT_REGION" ]]; then return; fi
   if [[ ! -z "$AWS_REGION" ]]; then
     print -n "$AWS_REGION"
-    if [[ -z "$AWS_DEFAULT_REGION" ]] && [[ "$AWS_DEFAULT_REGION" != "$AWS_REGION" ]]; then
+    if [[ ! -z "$AWS_DEFAULT_REGION" ]] && [[ "$AWS_DEFAULT_REGION" != "$AWS_REGION" ]]; then
       print -n " [$AWS_DEFAULT_REGION]"
     fi
   else
