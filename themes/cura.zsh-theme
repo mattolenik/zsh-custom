@@ -4,11 +4,6 @@ prod_symbol=${CURATHEME_SYMBOL_PROD:-"🐿️ "}
 other_symbol=${CURATHEME_SYMBOL:-"🎭 "}
 missing_symbol=${CURATHEME_SYMBOL_MISSING:-"🤷 "}
 
-collapsed_wd() {
-  wd=$(pwd)
-  print -n ${${:-/${(j:/:)${(M)${(s:/:)${(D)wd:h}}#(|.)[^.]}}/${wd:t}}//\/~/\~}
-}
-
 icon() {
   local resolved_profile=${AWS_PROFILE:-"$AWS_DEFAULT_PROFILE"}
   print -n %{$fg_bold[red]%}
@@ -67,7 +62,14 @@ aws_info() {
   print -n "\n\0" # The null character prevents the shell from stripping the newline when calling $(aws_info)
 }
 
-PROMPT='$(aws_info)%{$fg_bold[cyan]%}$(collapsed_wd) ${ret_status}%{$reset_color%}$(git_prompt_info)'
+if type shrink_path &> /dev/null; then
+  path_string='$(shrink_path -l -t)'
+else
+  path_string='%c'
+fi
+
+setopt prompt_subst
+PROMPT='$(aws_info)%{$fg_bold[cyan]%}'$path_string' ${ret_status}%{$reset_color%}$(git_prompt_info)'
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg_bold[blue]%}git:(%{$fg[red]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%} "
