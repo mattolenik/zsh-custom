@@ -1,4 +1,4 @@
-local ret_status="%(?:%{$fg_bold[green]%}➜ :%{$fg_bold[red]%}➜ )"
+local ret_status="%(?:%{$fg_bold[green]%}➜ :%{$fg_bold[red]%}➜ )%{$reset_color%}"
 nl=$'\n'
 prod_symbol=${CURATHEME_SYMBOL_PROD:-"🐿️ "}
 other_symbol=${CURATHEME_SYMBOL:-"🎭 "}
@@ -69,7 +69,8 @@ else
 fi
 
 setopt prompt_subst
-PROMPT='$(aws_info)%{$fg_bold[cyan]%}'$path_string' ${ret_status}%{$reset_color%}$(git_prompt_info)'
+[[ $(tput cols) -lt 80 ]] && wrap=$nl
+PROMPT='$(aws_info)%{$fg_bold[cyan]%}'$path_string' $(git_prompt_info)${ret_status}'
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg_bold[blue]%}git:(%{$fg[red]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%} "
